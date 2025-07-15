@@ -2,15 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import useAuth from "../../../hooks/useAuth";
 import useAxiosSecurity from "../../../hooks/useAxiosSecurity";
-import { FaEye, FaEdit, FaTrash, FaCreditCard } from "react-icons/fa";
+import { FaEye, FaEdit, FaTrash, FaCreditCard, FaMapMarkerAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
+import Loading from "../../shared/Loading/Loading";
 
 const MyParcels = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecurity();
   const navigate = useNavigate();
-
 
   // Fetch parcels
   const { data, refetch } = useQuery({
@@ -22,6 +22,10 @@ const MyParcels = () => {
   });
 
   const parcels = data?.data;
+
+  if (!parcels) {
+    return <Loading></Loading>;
+  }
 
   // Handle delete
   const handleDelete = async (id) => {
@@ -49,7 +53,11 @@ const MyParcels = () => {
 
   // Handle pay
   const handlePay = async (id) => {
-    navigate(`/dashboard/payment/${id}`)
+    navigate(`/dashboard/payment/${id}`);
+  };
+
+  const handleViewTracking = (trackingId) => {
+    navigate(`/dashboard/tracking/${trackingId}`);
   };
 
   return (
@@ -64,6 +72,7 @@ const MyParcels = () => {
             <th>Created</th>
             <th>Cost (৳)</th>
             <th>Payment</th>
+            <th>Delivery</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -100,19 +109,24 @@ const MyParcels = () => {
                   <span className="badge badge-error">Unpaid</span>
                 )}
               </td>
+              <td>{parcel.delivery_status || 'N/A'}</td>
               <td className="flex gap-2">
-                <button className="btn btn-sm btn-info" title="View">
-                  <FaEye />
+                <button
+                  onClick={() => handleViewTracking(parcel.tracking_id)}
+                  className="btn btn-sm btn-accent"
+                  title="View Tracking"
+                >
+                  <FaMapMarkerAlt className="mr-1" /> 
                 </button>
-                <button className="btn btn-sm btn-warning" title="Edit">
-                  <FaEdit />
-                </button>
+                {/* <button className="btn btn-sm btn-warning" title="Edit">
+                  <FaEdit /> 
+                </button> */}
                 <button
                   onClick={() => handleDelete(parcel._id)}
                   className="btn btn-sm btn-error"
                   title="Delete"
                 >
-                  <FaTrash />
+                  <FaTrash /> 
                 </button>
                 <button
                   onClick={() => handlePay(parcel._id)}
@@ -120,7 +134,7 @@ const MyParcels = () => {
                   title="Pay Now"
                   disabled={parcel.payment_status === "paid"}
                 >
-                  <FaCreditCard />
+                  <FaCreditCard /> 
                 </button>
               </td>
             </tr>

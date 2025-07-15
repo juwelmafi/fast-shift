@@ -21,7 +21,7 @@ const PendingRiders = () => {
     },
   });
 
-  const handleAccept = async (id) => {
+  const handleAccept = async (id, email) => {
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to approve this rider?",
@@ -36,6 +36,7 @@ const PendingRiders = () => {
       try {
         const res = await axiosSecure.patch(`/riders/status/${id}`, {
           status: "active",
+          email,
         });
         if (res.data.modifiedCount > 0) {
           Swal.fire("Accepted!", "Rider has been approved.", "success");
@@ -47,7 +48,7 @@ const PendingRiders = () => {
     }
   };
 
-  const handleReject = async (id) => {
+  const handleReject = async (id, email) => {
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to reject this rider?",
@@ -62,6 +63,7 @@ const PendingRiders = () => {
       try {
         const res = await axiosSecure.patch(`/riders/status/${id}`, {
           status: "rejected",
+          email,
         });
         if (res.data.modifiedCount > 0) {
           Swal.fire("Rejected!", "Rider has been rejected.", "info");
@@ -127,14 +129,14 @@ const PendingRiders = () => {
                   <FaEye />
                 </button>
                 <button
-                  onClick={() => handleAccept(rider._id)}
+                  onClick={() => handleAccept(rider._id, rider.email)}
                   className="btn btn-sm btn-success"
                   title="Accept"
                 >
                   <FaCheckCircle />
                 </button>
                 <button
-                  onClick={() => handleReject(rider._id)}
+                  onClick={() => handleReject(rider._id, rider.email)}
                   className="btn btn-sm btn-error"
                   title="Reject"
                 >

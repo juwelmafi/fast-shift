@@ -100,7 +100,7 @@ const Navbar = () => {
             </Link>
           )}
 
-          <Link className="btn btn-primary text-black">Be a rider</Link>
+          <Link to={'/be-rider'} className="btn btn-primary text-black">Be a rider</Link>
           <img src={upArrow} className="w-10" alt="" />
         </div>
       </div>

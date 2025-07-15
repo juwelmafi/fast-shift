@@ -4,6 +4,8 @@ import Swal from "sweetalert2";
 import { AuthContext } from "../../contexts/AuthContext/AuthContexts";
 import useAxiosSecurity from "../../hooks/useAxiosSecurity";
 import { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router";
+import useTrackingLogger from "../../hooks/useTrackingLogger";
 
 const AddParcelForm = () => {
   const {
@@ -18,7 +20,8 @@ const AddParcelForm = () => {
 
   const { user } = useContext(AuthContext);
   const axiosSecure = useAxiosSecurity();
-
+  const navigate = useNavigate();
+  const { logTracking } = useTrackingLogger();
   // for select locations and serivce center code //
   const [locations, setLocations] = useState([]);
   useEffect(() => {
@@ -89,7 +92,7 @@ const AddParcelForm = () => {
       creation_date: new Date().toISOString(),
       cost,
       payment_status: "unpaid",
-      delivety_status: "not_collected",
+      delivery_status: "not_collected",
       tracking_id,
     };
 
@@ -105,10 +108,9 @@ const AddParcelForm = () => {
       if (result.isConfirmed) {
         console.log("Saving to DB:", fullFormData);
 
-        axiosSecure.post("/parcels", fullFormData).then((res) => {
+        axiosSecure.post("/parcels", fullFormData).then(async (res) => {
           console.log(res.data);
           if (res?.data?.insertedId) {
-            //TODO: Redirect to the payment page
             Swal.fire({
               title: "Redirecting...",
               text: "Processing to payment gateway.",
@@ -116,6 +118,15 @@ const AddParcelForm = () => {
               timer: 1500,
               showConfirmButton: false,
             });
+
+            await logTracking({
+              tracking_id,
+              status: "parcel_created",
+              details: `Created by ${user.displayName}`,
+              updated_by: user.email,
+            });
+
+            navigate("/dashboard/my-parcels");
           }
         });
 

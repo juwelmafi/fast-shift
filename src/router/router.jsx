@@ -1,6 +1,4 @@
-import {
-  createBrowserRouter,
-} from "react-router";
+import { createBrowserRouter } from "react-router";
 import RootLayout from "../layouts/RootLayout/RootLayout";
 import Home from "../Pages/Home/Home";
 import AuthLayout from "../layouts/AuthLayout/AuthLayout";
@@ -16,8 +14,16 @@ import PaymentHistory from "../Pages/Dashboard/PaymentHIstory/PaymentHistory";
 import BeARidser from "../Pages/BeARider/BeARidser";
 import PendingRiders from "../Pages/Dashboard/PendingRiders/PendingRiders";
 import ActiveRiders from "../Pages/Dashboard/ActiveRiders/ActiveRiders";
-
-
+import ManageAdmins from "../Pages/Dashboard/ManageAdmins/ManageAdmins";
+import ForbiddenAccess from "../Pages/Forbidden/ForbiddenAccess";
+import AdminRoute from "../routes/AdminRoute";
+import AssignRider from "../Pages/Dashboard/AssignRider/AssignRider";
+import RiderRoute from "../routes/RiderRoute";
+import PendingTask from "../Pages/Dashboard/PendingTask/PendingTask";
+import CompletedDeliveries from "../Pages/Dashboard/CompletedDeliveries/CompletedDeliveries";
+import MyEarnings from "../Pages/Dashboard/MyEarnings/MyEarnings";
+import TrackingTimeline from "../Pages/Dashboard/TrackingTimeline/TrackingTimeline";
+import DashBoardHome from "../Pages/Dashboard/DashboardHome/DashBoardHome";
 
 export const router = createBrowserRouter([
   {
@@ -29,19 +35,31 @@ export const router = createBrowserRouter([
         Component: Home,
       },
       {
-        path: '/coverege',
-        loader: ()=> fetch('./warehouses.json'),
-        Component: Coverege
+        path: "/coverege",
+        loader: () => fetch("./warehouses.json"),
+        Component: Coverege,
       },
       {
-        path:'/be-rider',
-        element: <PrivateRoute><BeARidser></BeARidser></PrivateRoute>
+        path: "/be-rider",
+        element: (
+          <PrivateRoute>
+            <BeARidser></BeARidser>
+          </PrivateRoute>
+        ),
       },
       {
-        path: '/send-parcel',
-        element: <PrivateRoute><SendParcel></SendParcel></PrivateRoute>
-      }
-    ]
+        path: "/send-parcel",
+        element: (
+          <PrivateRoute>
+            <SendParcel></SendParcel>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/forbidden-access",
+        Component: ForbiddenAccess,
+      },
+    ],
   },
   {
     path: "/",
@@ -52,18 +70,30 @@ export const router = createBrowserRouter([
         Component: LogIn,
       },
       {
-        path: '/register',
+        path: "/register",
         Component: Register,
-      }
-    ]
+      },
+    ],
   },
   {
     path: "/dashboard",
-    element: <PrivateRoute><DashLayout></DashLayout></PrivateRoute>,
+    element: (
+      <PrivateRoute>
+        <DashLayout></DashLayout>
+      </PrivateRoute>
+    ),
     children: [
       {
-        path: 'my-parcels',
-        Component: MyParcels
+        index: true,
+        Component: DashBoardHome,
+      },
+      {
+        path: "my-parcels",
+        Component: MyParcels,
+      },
+      {
+        path: "tracking/:tracking_id",
+        Component: TrackingTimeline,
       },
       {
         path: "payment/:parcelId",
@@ -73,14 +103,68 @@ export const router = createBrowserRouter([
         path: "payment-history",
         Component: PaymentHistory,
       },
+      // rider only routes
+
+      {
+        path: "pending-task",
+        element: (
+          <RiderRoute>
+            <PendingTask></PendingTask>
+          </RiderRoute>
+        ),
+      },
+      {
+        path: "completed-deliveries",
+        element: (
+          <RiderRoute>
+            <CompletedDeliveries></CompletedDeliveries>
+          </RiderRoute>
+        ),
+      },
+      {
+        path: "my-earnings",
+        element: (
+          <RiderRoute>
+            <MyEarnings></MyEarnings>
+          </RiderRoute>
+        ),
+      },
+
+      //admin only routes
       {
         path: "pending-riders",
-        Component: PendingRiders,
+
+        element: (
+          <AdminRoute>
+            <PendingRiders></PendingRiders>
+          </AdminRoute>
+        ),
       },
       {
         path: "active-riders",
-        Component: ActiveRiders,
-      }
-    ]
-  }
+
+        element: (
+          <AdminRoute>
+            <ActiveRiders></ActiveRiders>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "manage-admins",
+        element: (
+          <AdminRoute>
+            <ManageAdmins></ManageAdmins>
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "assign-rider",
+        element: (
+          <AdminRoute>
+            <AssignRider></AssignRider>
+          </AdminRoute>
+        ),
+      },
+    ],
+  },
 ]);

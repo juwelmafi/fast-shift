@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import useAuth from "../../hooks/useAuth";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import SocialLogIn from "./SocialLogin/SocialLogIn";
 import { FaArrowUp, FaUserCircle } from "react-icons/fa";
 import axios from "axios";
@@ -15,13 +15,15 @@ const Register = () => {
   } = useForm();
   const axiosPublic = useAxiosPublic();
   const { createUser, updateUserPrfile } = useAuth();
-  const navigate = useNavigate();
   const [imagePreview, setImagePreview] = useState(null);
   const [profilePic, setProfilePic] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || "/";
   const onSubmit = (data) => {
     console.log(data);
     createUser(data?.email, data?.password)
-      .then(async(result) => {
+      .then(async (result) => {
         console.log(result.user);
 
         //update user info in database
@@ -33,8 +35,8 @@ const Register = () => {
           last_logged_in: new Date().toISOString(),
         };
 
-        const userRes = await axiosPublic.post('/users', userInfo)
-        console.log(userRes.data)
+        const userRes = await axiosPublic.post("/users", userInfo);
+        console.log(userRes.data);
 
         //update user profile in firebase
 
@@ -50,7 +52,7 @@ const Register = () => {
             console.log(error);
           });
 
-        navigate("/");
+        navigate(from);
       })
       .catch((error) => {
         console.log(error);

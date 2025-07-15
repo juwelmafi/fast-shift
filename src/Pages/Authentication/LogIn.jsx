@@ -5,12 +5,13 @@ import SocialLogIn from "./SocialLogin/SocialLogIn";
 import useAuth from "../../hooks/useAuth";
 const LogIn = () => {
   const {signInUser} = useAuth();
-const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate();
   const location =useLocation();
  const from = location.state?.from || "/"
 
@@ -60,7 +61,7 @@ const navigate = useNavigate();
         <button className="btn w-[20rem] btn-primary text-black mt-4">Login</button>
         <p className="mt-2">
           Don't have an account?{" "}
-          <Link to={"/register"} className="-mt-2 btn btn-link p-0">
+          <Link to={"/register"} className="-mt-2 btn btn-link p-0" state={{from}}>
             {" "}
             Register
           </Link>{" "}

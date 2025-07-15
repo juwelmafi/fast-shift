@@ -11,6 +11,7 @@ import useAxiosSecurity from "../../../../hooks/useAxiosSecurity";
 import Loading from "../../../shared/Loading/Loading";
 import useAuth from "../../../../hooks/useAuth";
 import Swal from "sweetalert2";
+import useTrackingLogger from "../../../../hooks/useTrackingLogger";
 const PaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
@@ -21,6 +22,7 @@ const PaymentForm = () => {
   const { parcelId } = useParams();
   const axiosSecure = useAxiosSecurity();
   const navigate = useNavigate();
+  const { logTracking } = useTrackingLogger();
   console.log(parcelId);
 
   const { isPending, data } = useQuery({
@@ -66,9 +68,9 @@ const PaymentForm = () => {
       setSuccess("");
       setLoading(false);
       return;
-    }else{
-      setError("")
-      console.log('payment method', paymentMethod)
+    } else {
+      setError("");
+      console.log("payment method", paymentMethod);
     }
 
     try {
@@ -114,6 +116,13 @@ const PaymentForm = () => {
             title: "Payment Successful!",
             html: `<strong>Transaction ID:</strong> <code>${result?.paymentIntent?.id}</code>`,
             confirmButtonText: "Go to My Parcels",
+          });
+
+          await logTracking({
+            tracking_id: parcelInfo.tracking_id,
+            status: "payment_done",
+            details: `Paid by ${user.displayName}`,
+            updated_by: user.email,
           });
 
           navigate("/dashboard/my-parcels");
